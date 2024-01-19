@@ -22,7 +22,7 @@
                 "--server",
                 "root@103.103.245.177",
                 "--key",
-                "/Users/chenwenjie/.ssh/id_ed25519",
+                "/root/.ssh/id_ed25519",
                 "-R",
                 "0"
             ],
