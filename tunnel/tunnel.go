@@ -1,6 +1,7 @@
 package tunnel
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -307,7 +308,23 @@ func (t *Tunnel) startChannel(channel *SSHChannel) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("dial error: %s", err)
+		fmt.Printf("error dialing destination: %s", err)
+		response := []byte("HTTP/1.1 503 Service Unavailable\r\n" +
+			"Content-Type: text/html; charset=utf-8\r\n" +
+			"Content-Length: 122\r\n" +
+			"\r\n" +
+			"<html>\r\n" +
+			"<head><title>dest dial error</title></head>\r\n" +
+			"<body>\r\n" +
+			"<center><h1>dest dial error</h1></center>\r\n" +
+			"</body>\r\n" +
+			"</html>\r\n")
+		errR := bytes.NewReader(response)
+
+		io.Copy(channel.conn, errR)
+		channel.conn.Close()
+		return nil
+		// return fmt.Errorf("dial error: %s", err)
 	}
 
 	go copyConn(channel.conn, destinationConn)
